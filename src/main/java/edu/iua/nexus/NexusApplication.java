@@ -1,5 +1,7 @@
 package edu.iua.nexus;
 
+import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +19,9 @@ EL commandLInerunner hace que se ejecute el método run al iniciar la app y q es
 */
 public class NexusApplication extends SpringBootServletInitializer implements CommandLineRunner {
 
+	@Autowired
+	private Environment env;
+
 	public static void main(String[] args) {
 		SpringApplication.run(NexusApplication.class, args);
 	}
@@ -26,6 +31,10 @@ public class NexusApplication extends SpringBootServletInitializer implements Co
 
 	@Override
 	public void run(String... args) throws Exception {
-		log.info("Perfil Activo '{}'",profile);
-	}
+		String[] profiles = env.getActiveProfiles();
+		if (profiles.length == 0) {
+			log.info("No hay perfiles activos (usando configuración por defecto)");
+		} else {
+			log.info("Perfiles activos: {}", String.join(", ", profiles));
+		}	}
 }

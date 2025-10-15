@@ -28,5 +28,5 @@ public class Truck {
     private String description;
 
     @OneToMany(mappedBy = "truck",cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Tank> tankers = new HashSet<>();
+    private Set<Tank> tanks = new HashSet<>();
 }
