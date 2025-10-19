@@ -8,4 +8,10 @@ public final class Constants {
 	public static final String URL_LOGIN = URL_BASE + "/login";
 	public static final String URL_MAIL = URL_BASE + "/mail";	
 	public static final String URL_AUTHORIZATION = URL_BASE + "/authtest";
+
+    public static final String URL_DETAILS = URL_BASE + "/details";
+    public static final String URL_PRODUCTS = URL_BASE + "/products";
+    public static final String URL_ORDERS = URL_BASE + "/orders";
+    public static final String URL_SUPPLIERS = URL_BASE + "/suppliers";
+    public static final String URL_USERS = URL_BASE + "/users";
 }
