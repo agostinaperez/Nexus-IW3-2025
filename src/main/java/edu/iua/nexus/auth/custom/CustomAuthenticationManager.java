@@ -15,8 +15,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import edu.iua.nexus.auth.IUserBusiness;
-import edu.iua.nexus.auth.User;
+import edu.iua.nexus.auth.model.IUserAuthBusiness;
+import edu.iua.nexus.auth.model.User;
 import edu.iua.nexus.model.business.BusinessException;
 import edu.iua.nexus.model.business.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CustomAuthenticationManager implements AuthenticationManager {
 
-	private IUserBusiness userBusiness;
+	private IUserAuthBusiness userBusiness;
 
 	private PasswordEncoder pEncoder;
 
-	public CustomAuthenticationManager(PasswordEncoder pEncoder, IUserBusiness userBusiness) {
+	public CustomAuthenticationManager(PasswordEncoder pEncoder, IUserAuthBusiness userBusiness) {
 		this.pEncoder = pEncoder; //a esto ya me lo pasan de pecho
 		this.userBusiness = userBusiness;
 	}

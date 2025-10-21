@@ -10,7 +10,6 @@ import edu.iua.nexus.util.PaginationInfo;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,14 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Tag(description = "API Interna para Gestionar Ordenes", name = "Order")
 @RestController
 @RequestMapping(Constants.URL_ORDERS)
 public class OrderRestController extends BaseRestController {
 
     @Autowired
     private IOrderBusiness orderBusiness;
-
 
     /* ENPOINT PARA OBTENER UNA LISTA DE ORDENES (PAGINABLE) */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)

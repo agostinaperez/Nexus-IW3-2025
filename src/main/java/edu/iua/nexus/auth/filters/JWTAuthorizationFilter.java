@@ -18,8 +18,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import edu.iua.nexus.auth.Role;
-import edu.iua.nexus.auth.User;
+import edu.iua.nexus.auth.model.Role;
+import edu.iua.nexus.auth.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
