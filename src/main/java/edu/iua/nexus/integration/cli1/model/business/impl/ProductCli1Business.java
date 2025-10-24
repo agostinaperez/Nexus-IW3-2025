@@ -79,7 +79,7 @@ public class ProductCli1Business implements IProductCli1Business {
             product.setDescription(baseProduct.getDescription());
             product.setThresholdTemperature(baseProduct.getThresholdTemperature());
 
-            productDAO.insertProductCli1(baseProduct.getId(), product.getIdCli1(), false);
+            productDAO.insertProductCli1(baseProduct.getId(), product.getIdCli1());
             return baseProduct;
 
         } catch (DataIntegrityViolationException e) {
