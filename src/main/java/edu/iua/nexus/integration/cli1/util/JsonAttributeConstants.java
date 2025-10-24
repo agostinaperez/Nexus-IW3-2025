@@ -8,9 +8,9 @@ public class JsonAttributeConstants {
     public static final String[] ORDER_PRESET_ATTRIBUTES = {"preset", "order_preset"};
 
     // Constantes para el nodo Driver
-    public static final String[] DRIVER_NODE_ATTRIBUTES = {"driver", "Driver", "choffer", "C hoffer"};
+    public static final String[] DRIVER_NODE_ATTRIBUTES = {"driver", "Driver", "choffer", "Choffer"};
     public static final String[] DRIVER_IDCLI1_ATTRIBUTES = {"id", "id_driver", "code", "driver_code"};
-    public static final String[] DRIVER_NAME_ATTRIBUTES = {"name", "driver_name", "driver","choffer_name"};
+    public static final String[] DRIVER_NAME_ATTRIBUTES = {"name", "driver_name", "driver","chofer_name"};
     public static final String[] DRIVER_LASTNAME_ATTRIBUTES = {"lastname", "driver_lastname", "last_name", "driver_last_name","choffer_last_name"};
     public static final String[] DRIVER_DOCUMENT_ATTRIBUTES = {"driver_document", "driver_document_number", "document","choffer_document"};
 

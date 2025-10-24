@@ -20,8 +20,9 @@ import lombok.Setter;
 public class OrderCli1 extends Order {
 
     @Column(nullable = false, unique = true)
-    private String orderNumberCli1;
+    private String orderNumberCli1; //código externo único
 
-    private boolean codCli1Temp=false;
+    private boolean codCli1Temp=false; // esto está en caso de que me pasen sin código externo. Le voy a generar uno temporal
+    //igual x ahora asumo q siempre me viene el num de order, no voy a usar esta validacion x ahora
 
 }
