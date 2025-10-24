@@ -23,5 +23,4 @@ public class DriverCli1 extends Driver {
     @Column(nullable = false, unique = true)
     private String idCli1;
 
-    private boolean codCli1Temp=false;
 }

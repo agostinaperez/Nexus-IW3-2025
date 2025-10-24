@@ -22,6 +22,4 @@ public class TruckCli1 extends Truck {
 
     @Column(nullable = false, unique = true)
     private String idCli1;
-
-    private boolean codCli1Temp=false;
 }

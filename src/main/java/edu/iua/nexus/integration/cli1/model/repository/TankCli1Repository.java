@@ -13,6 +13,6 @@ public interface TankCli1Repository extends JpaRepository<TankCli1, Long> {
     Optional<TankCli1> findOneByIdCli1(String idCli1);
 
     @Modifying
-    @Query(value = "INSERT INTO cli1_tanks (id_tank, id_cli1, cod_cli1temp) VALUES (:idTank, :idCli1, false)", nativeQuery = true)
+    @Query(value = "INSERT INTO cli1_tanks (id_tank, id_cli1) VALUES (:idTank, :idCli1)", nativeQuery = true)
     void insertTankCli1(@Param("idTank") Long idTank, @Param("idCli1") String idCli1);
 }

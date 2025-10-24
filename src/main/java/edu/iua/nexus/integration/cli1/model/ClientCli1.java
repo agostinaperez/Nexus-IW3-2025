@@ -21,6 +21,4 @@ public class ClientCli1 extends Client {
 
     @Column(nullable = false, unique = true)
     private String idCli1;
-
-    private boolean codCli1Temp=false;
 }

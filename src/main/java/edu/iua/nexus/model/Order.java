@@ -41,7 +41,7 @@ public class Order {
     private Integer activatePassword;
 
     @Column(nullable = false)
-    private int preset;
+    private int preset; //cantidad de kg a cargar
 
     private float initialWeighing;
 
