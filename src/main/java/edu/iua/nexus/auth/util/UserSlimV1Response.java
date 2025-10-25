@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.List;
 
+/**
+ * DTO reducido que viaja al frontend después del login interno,
+ * suficiente para poblar la sesión (username, email y roles en texto).
+ */
 @Getter
 @Setter
 @NoArgsConstructor

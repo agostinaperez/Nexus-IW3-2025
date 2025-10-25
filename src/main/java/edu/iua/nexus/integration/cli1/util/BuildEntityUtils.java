@@ -11,8 +11,13 @@ import java.util.Set;
 
 import static edu.iua.nexus.integration.cli1.util.JsonAttributeConstants.*;
 
+/**
+ * Tiene la lógica para transformar un JsonNode en
+ * objetos de transferencia propios del integrador, aplicando validaciones básicas
+ * antes de permitir que lleguen a la capa de negocio.
+ */
 public class BuildEntityUtils {
-//si algo llega a fallar, me tengo q acordar de que estoy asumiendo q siempre voy a haber pasado un codcli1
+    //si algo llega a fallar, me tengo q acordar de que estoy asumiendo q siempre voy a haber pasado un codcli1
     public static DriverCli1 buildDriver(JsonNode driverNode) throws BadRequestException {
         DriverCli1 newDriver = new DriverCli1();
 

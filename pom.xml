@@ -97,6 +97,16 @@
 		    <artifactId>java-jwt</artifactId>
 		    <version>4.5.0</version>
 		</dependency>
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
+            <version>6.1.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-messaging</artifactId>
+            <version>6.1.14</version>
+        </dependency>
 	</dependencies>
 
 	<profiles>

@@ -20,8 +20,20 @@ import static edu.iua.nexus.integration.cli1.util.JsonAttributeConstants.*;
 import static edu.iua.nexus.util.JsonUtils.getJsonNode;
 import static edu.iua.nexus.util.JsonUtils.getString;
 
+/**
+ * Funciones utilitarias que encapsulan la lógica de lectura de los nodos JSON enviados por el CLI1.
+ * Cada helper navega hasta el subdocumento correcto, valida los atributos esperados y delega en los
+ * business correspondientes para crear/obtener las entidades del dominio interno.
+ */
 public class JsonUtilsCli1 {
 
+    /**
+     * Obtiene o crea un conductor a partir del nodo "driver".
+     *
+     * @param node nodo raíz del payload CLI1
+     * @param attrs posibles nombres del campo documento
+     * @param driverCli1Business capa de negocio que persiste el conductor
+     */
     public static Driver getDriver(JsonNode node, String[] attrs, IDriverCli1Business driverCli1Business) throws FoundException, BusinessException, NotFoundException, BadRequestException {
         JsonNode driverNode = getJsonNode(node, DRIVER_NODE_ATTRIBUTES); // Buscar el nodo padre "driver"
         if (driverNode != null) {
@@ -44,6 +56,9 @@ public class JsonUtilsCli1 {
         }
     }
 
+    /**
+     * Recorre el nodo "truck", procesa la colección de tanques y delega el alta/lookup del camión.
+     */
     public static Truck getTruck(JsonNode node, String[] attrs, ITruckCli1Business truckCli1Business) throws FoundException, BusinessException, NotFoundException, BadRequestException {
         JsonNode truckNode = getJsonNode(node, TRUCK_NODE_ATTRIBUTES); // Buscar el nodo padre "truck"
         if (truckNode != null) {
@@ -59,6 +74,9 @@ public class JsonUtilsCli1 {
         }
     }
 
+    /**
+     * Interpreta el nodo "client" y registra al cliente si aún no existe.
+     */
     public static Client getClient(JsonNode node, String[] attrs, IClientCli1Business clientCli1Business) throws FoundException, BusinessException, NotFoundException, BadRequestException {
         JsonNode clientNode = getJsonNode(node, CLIENT_NODE_ATTRIBUTES); // Buscar el nodo padre "client"
         if (clientNode != null) {
@@ -82,6 +100,9 @@ public class JsonUtilsCli1 {
         //return null;
     }
 
+    /**
+     * Carga el producto asociado a la orden recurriendo al catálogo interno.
+     */
     public static Product getProduct(JsonNode node, String[] attrs, IProductCli1Business productCli1Business) throws BusinessException, NotFoundException, FoundException, BadRequestException {
         JsonNode productNode = getJsonNode(node, PRODUCT_NODE_ATTRIBUTES); // Buscar el nodo padre "product"
         if (productNode != null) {

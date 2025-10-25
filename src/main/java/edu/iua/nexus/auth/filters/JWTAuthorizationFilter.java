@@ -26,12 +26,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Filtro que se ejecuta en cada request protegido para validar el JWT entrante.
+ * Extrae el token desde header o query param, lo verifica con la clave compartida
+ * y, si es válido, arma un {@link UsernamePasswordAuthenticationToken} con los roles del usuario.
+ */
 @Slf4j
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 	public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
 		super(authenticationManager);
 	}
 
+	/**
+	 * Intercepta la petición y decide si debe intentar autenticar en base a los datos recibidos.
+	 * Si no se provee token, la cadena de filtros continúa sin alterar el contexto de seguridad.
+	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
@@ -79,6 +88,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 				List<String> rolesStr = (List<String>) jwt.getClaim("roles").as(List.class);
 				authorities = rolesStr.stream().map(role -> new SimpleGrantedAuthority(role))
 						.collect(Collectors.toList());
+				// Creamos instancias Role mínimas para mantener compatibilidad con el modelo del dominio
 				roles=rolesStr.stream().map(role-> new Role(role,0,role)).collect(Collectors.toSet());
 				String username = jwt.getSubject();
 
