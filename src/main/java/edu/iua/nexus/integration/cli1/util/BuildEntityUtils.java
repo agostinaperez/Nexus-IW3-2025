@@ -11,10 +11,22 @@ import java.util.Set;
 
 import static edu.iua.nexus.integration.cli1.util.JsonAttributeConstants.*;
 
+/**
+ * Tiene la lógica para transformar un JsonNode en
+ * objetos de transferencia propios del integrador, aplicando validaciones básicas
+ * antes de permitir que lleguen a la capa de negocio.
+ */
 public class BuildEntityUtils {
-//si algo llega a fallar, me tengo q acordar de que estoy asumiendo q siempre voy a haber pasado un codcli1
+    //si algo llega a fallar, me tengo q acordar de que estoy asumiendo q siempre voy a haber pasado un codcli1
     public static DriverCli1 buildDriver(JsonNode driverNode) throws BadRequestException {
         DriverCli1 newDriver = new DriverCli1();
+
+        String idCli1 = JsonUtils.getString(driverNode, DRIVER_IDCLI1_ATTRIBUTES, "");
+        if (idCli1 != null && !idCli1.isEmpty()) {
+            newDriver.setIdCli1(idCli1);
+        } else {
+            throw new BadRequestException("El identificador del conductor no puede ser nulo o vacío");
+        }
 
         String name = JsonUtils.getString(driverNode, DRIVER_NAME_ATTRIBUTES, "");
         if (name != null && !name.isEmpty()) {
@@ -43,6 +55,13 @@ public class BuildEntityUtils {
     public static TruckCli1 buildTruck(JsonNode truckNode, JsonNode tanksNode) throws BadRequestException {
         TruckCli1 newTruck = new TruckCli1();
 
+        String idCli1 = JsonUtils.getString(truckNode, TRUCK_IDCLI1_ATTRIBUTES, "");
+        if (idCli1 != null && !idCli1.isEmpty()) {
+            newTruck.setIdCli1(idCli1);
+        } else {
+            throw new BadRequestException("El identificador del camión no puede ser nulo o vacío");
+        }
+
         String licensePlate = JsonUtils.getString(truckNode, TRUCK_LICENSE_PLATE_ATTRIBUTES, "");
         if (licensePlate != null && !licensePlate.isEmpty()) {
             newTruck.setLicensePlate(licensePlate);
@@ -59,6 +78,13 @@ public class BuildEntityUtils {
         if (tanksNode != null && tanksNode.isArray()) {
             for (JsonNode tankNode : tanksNode) {
                 TankCli1 tank = new TankCli1();
+
+                String tankIdCli1 = JsonUtils.getString(tankNode, TANK_IDCLI1_ATTRIBUTES, "");
+                if (tankIdCli1 != null && !tankIdCli1.isEmpty()) {
+                    tank.setIdCli1(tankIdCli1);
+                } else {
+                    throw new BadRequestException("El identificador del tanque no puede ser nulo o vacío");
+                }
 
                 long capacityLiters = (long) JsonUtils.getValue(tankNode, TANK_CAPACITY_ATTRIBUTES, 0);
                 if (capacityLiters > 0) {
@@ -82,6 +108,13 @@ public class BuildEntityUtils {
     public static ClientCli1 buildClient(JsonNode clientNode) throws BadRequestException {
         ClientCli1 newClient = new ClientCli1();
 
+        String idCli1 = JsonUtils.getString(clientNode, CLIENT_IDCLI1_ATTRIBUTES, "");
+        if (idCli1 != null && !idCli1.isEmpty()) {
+            newClient.setIdCli1(idCli1);
+        } else {
+            throw new BadRequestException("El identificador del cliente no puede ser nulo o vacío");
+        }
+
         String name = JsonUtils.getString(clientNode, CLIENT_NAME_ATTRIBUTES, "");
         if (name != null && !name.isEmpty()) {
             newClient.setName(name);
@@ -101,6 +134,14 @@ public class BuildEntityUtils {
 
     public static ProductCli1 buildProduct(JsonNode productNode) throws BadRequestException {
         ProductCli1 newProduct = new ProductCli1();
+
+        String idCli1 = JsonUtils.getString(productNode, PRODUCT_IDCLI1_ATTRIBUTES, "");
+        if (idCli1 != null && !idCli1.isEmpty()) {
+            newProduct.setIdCli1(idCli1);
+        } else {
+            throw new BadRequestException("El identificador del producto no puede ser nulo o vacío");
+        }
+
         String product = JsonUtils.getString(productNode, PRODUCT_NAME_ATTRIBUTES, "");
 
         if (product != null && !product.isEmpty()) {

@@ -12,6 +12,11 @@ import edu.iua.nexus.model.business.BusinessException;
 import edu.iua.nexus.model.business.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Su responsabilidad es puramente de autenticación/autorización: cargar un usuario por username o email, 
+ * validar la contraseña vieja para permitir un cambio, habilitar o deshabilitar cuentas y entregar la lista para procesos de seguridad. 
+ * Trabaja junto a CustomAuthenticationManager, el filtro JWT y los controladores de login, por eso se queda en el package auth
+ */
 @Service
 @Slf4j
 public class UserAuthBusiness implements IUserAuthBusiness {

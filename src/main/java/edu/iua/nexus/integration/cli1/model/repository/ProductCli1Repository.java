@@ -2,7 +2,6 @@ package edu.iua.nexus.integration.cli1.model.repository;
 
 import edu.iua.nexus.integration.cli1.model.ProductCli1;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
