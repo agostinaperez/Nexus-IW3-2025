@@ -41,6 +41,9 @@ public class AuthRestController extends BaseRestController {
     @Autowired
     private PasswordEncoder pEncoder;
 
+    /**
+     * Punto de acceso diseñado para integraciones externas que únicamente requieren un JWT (JSON WEB TOKEN).
+     */
     @PostMapping(value = Constants.URL_EXTERNAL_LOGIN, produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<?> loginExternalOnlyToken(@RequestParam String username, @RequestParam String password) {
         Authentication auth = null;
@@ -68,6 +71,10 @@ public class AuthRestController extends BaseRestController {
     }
 
     @SneakyThrows
+    /**
+     * Endpoint usado por la UI interna: devuelve el token y una representación ligera del usuario
+     * para poblar el store del front sin exponer datos sensibles.
+     */
     @PostMapping(value = Constants.URL_INTERNAL_LOGIN, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginInternal(@RequestBody User user) {
         Authentication auth = null;
@@ -109,6 +116,9 @@ public class AuthRestController extends BaseRestController {
     }
 
     @SneakyThrows
+    /**
+     * Permite a un cliente validar el token vigente y recuperar sus propios datos en formato slim.
+     */
     @GetMapping(value = Constants.URL_TOKEN_VALIDATE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> validateToken() {
         User user = getUserLogged();

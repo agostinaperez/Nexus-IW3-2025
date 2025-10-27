@@ -10,7 +10,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
-      - "33308:3306"
+      - "33307:3306"
     volumes:
       - nexusdb_data:/var/lib/mysql
       - /etc/localtime:/etc/localtime:ro

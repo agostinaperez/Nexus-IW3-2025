@@ -15,6 +15,8 @@ import java.util.*;
 @Service
 @Slf4j
 public class UserBusiness implements IUserBusiness {
+    /*pertenece al paquete de negocio general (model.business). Ahí la idea es manejar el CRUD completo que requiere la aplicación (listar todos, cargar por id o username, agregar, actualizar respetando unicidad, borrar). 
+    Este servicio lo consumen los endpoints o casos de uso funcionales del dominio, no la capa de seguridad. */
 
     @Autowired
     private UserRepository userDAO;
