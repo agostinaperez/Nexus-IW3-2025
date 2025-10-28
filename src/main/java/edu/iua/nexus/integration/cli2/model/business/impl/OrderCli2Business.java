@@ -1,28 +1,17 @@
 package edu.iua.nexus.integration.cli2.model.business.impl;
 
-import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
-import edu.iua.nexus.integration.cli1.model.business.interfaces.*;
-import edu.iua.nexus.integration.cli1.model.repository.OrderCli1Repository;
 import edu.iua.nexus.integration.cli2.model.business.interfaces.IOrderCli2Business;
 import edu.iua.nexus.model.Order;
-import edu.iua.nexus.model.Product;
-import edu.iua.nexus.model.business.BadRequestException;
 import edu.iua.nexus.model.business.BusinessException;
 import edu.iua.nexus.model.business.FoundException;
 import edu.iua.nexus.model.business.NotFoundException;
 import edu.iua.nexus.model.business.interfaces.IOrderBusiness;
 import edu.iua.nexus.model.repository.OrderRepository;
 import edu.iua.nexus.util.ActivationPasswordGenerator;
-import edu.iua.nexus.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.iua.nexus.integration.cli1.model.OrderCli1;
-import edu.iua.nexus.integration.cli1.model.deserializers.OrderCli1JsonDeserializer;
 import lombok.extern.slf4j.Slf4j;
 
 
