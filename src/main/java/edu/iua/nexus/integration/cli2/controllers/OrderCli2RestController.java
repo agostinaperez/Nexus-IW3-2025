@@ -30,7 +30,7 @@ public class OrderCli2RestController extends BaseRestController{
         return new ResponseEntity<>(order.getActivatePassword().toString(), responseHeaders, HttpStatus.OK);
     }
 
-
+// ENDPOINT 5
     @SneakyThrows
     @PostMapping(value = "/final-weighing", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerFinalWeighing(

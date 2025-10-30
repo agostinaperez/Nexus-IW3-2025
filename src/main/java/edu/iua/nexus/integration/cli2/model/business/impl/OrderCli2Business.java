@@ -84,7 +84,7 @@ public class OrderCli2Business implements IOrderCli2Business {
 
         Order order = orderFound.get();
 
-        if (order.getStatus() == Order.Status.CLOSED) {
+        if (order.getStatus() == Order.Status.REGISTERED_FINAL_WEIGHING) {
             throw FoundException.builder()
                     .message("La orden ya tiene pesaje final registrado")
                     .build();
@@ -98,7 +98,7 @@ public class OrderCli2Business implements IOrderCli2Business {
 
         order.setFinalWeighing(finalWeight);
         order.setFinalWeighingDate(new Date());
-        order.setStatus(Order.Status.CLOSED);
+        order.setStatus(Order.Status.REGISTERED_FINAL_WEIGHING);
         orderBusiness.update(order);
 
         float initialWeighing = order.getInitialWeighing();
