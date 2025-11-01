@@ -47,4 +47,14 @@ public class OrderCli3RestController {
         responseHeaders.set("Order-Id", String.valueOf(order.getId()));
         return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
     }
+
+    //Punto 4
+    @PostMapping("/close")
+    @SneakyThrows
+    public ResponseEntity<?> closeOrderCli3Endpoint(@RequestHeader("OrderId") Long orderId) {
+        Order order = orderCli3Business.closeOrder(orderId);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Order-Id", String.valueOf(order.getId()));
+        return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
+    }
 }
