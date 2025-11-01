@@ -53,9 +53,7 @@ public class OrderCli3Business implements IOrderCli3Business {
     public Order receiveDetails(Detail detail) throws NotFoundException, BusinessException, ConflictException {
         Order orderFound = orderBusiness.load(detail.getOrder().getId());
 //validaciones
-        if (orderFound.getStatus() != Order.Status.REGISTERED_INITIAL_WEIGHING) {
-            throw new ConflictException("Estado de orden no válido");
-        }
+        checkOrderStatus(orderFound);
         if (detail.getFlowRate() < 0) {
             throw new BusinessException("Caudal no válido");
         }
@@ -93,9 +91,7 @@ public class OrderCli3Business implements IOrderCli3Business {
         Order order = orderBusiness.load(orderId); // Throws NotFoundException, BusinessException
 
         // 2. Validar el estado actual
-        if (order.getStatus() != Order.Status.REGISTERED_INITIAL_WEIGHING) {
-            throw new ConflictException("La orden no se puede cerrar porque no está en estado 'REGISTERED_INITIAL_WEIGHING'. Estado actual: " + order.getStatus());
-        }
+        checkOrderStatus(order); // Throws ConflictException
 
         // 3. Cambiar el estado
         order.setStatus(Order.Status.CLOSED);
