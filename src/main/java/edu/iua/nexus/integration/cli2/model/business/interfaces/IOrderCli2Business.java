@@ -11,5 +11,6 @@ public interface IOrderCli2Business {
 
     Order registerInitialWeighing(String orderNumber, float initialWeight) throws BusinessException, NotFoundException, FoundException, ConflictException;
 
-    //byte[] registerFinalWeighing(String orderNumber, float finalWeight) throws BusinessException, NotFoundException, FoundException, ConflictException;
+    //ENDPOINT 5
+    byte[] registerFinalWeighing(String orderNumber, float finalWeight) throws BusinessException, NotFoundException, FoundException, ConflictException;
 }

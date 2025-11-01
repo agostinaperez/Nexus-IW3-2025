@@ -1,17 +1,25 @@
 package edu.iua.nexus.integration.cli2.model.business.impl;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import edu.iua.nexus.integration.cli2.model.business.interfaces.IOrderCli2Business;
 import edu.iua.nexus.model.Order;
+import edu.iua.nexus.model.Product;
 import edu.iua.nexus.model.business.BusinessException;
 import edu.iua.nexus.model.business.FoundException;
 import edu.iua.nexus.model.business.NotFoundException;
+import edu.iua.nexus.model.business.impl.DetailBusiness;
 import edu.iua.nexus.model.business.interfaces.IOrderBusiness;
 import edu.iua.nexus.model.repository.OrderRepository;
 import edu.iua.nexus.util.ActivationPasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -25,8 +33,8 @@ public class OrderCli2Business implements IOrderCli2Business {
     @Autowired
     private IOrderBusiness orderBusiness;
 
-    //@Autowired
-    //private DetailBusiness detailBusiness;
+    @Autowired
+    private DetailBusiness detailBusiness;
 
 
     @Override
@@ -56,24 +64,35 @@ public class OrderCli2Business implements IOrderCli2Business {
         return orderFound.get();
     }
 
-    /*
+    // ENDPONIT 5
     @Override
-    public byte[] registerFinalWeighing(String licensePlate, float finalWeight) throws BusinessException, NotFoundException, FoundException {
-        Optional<Order> orderFound;
+    public byte[] registerFinalWeighing(String licensePlate, float finalWeight)
+            throws BusinessException, NotFoundException, FoundException {
 
+        Optional<Order> orderFound;
         try {
             orderFound = orderDAO.findByTruck_LicensePlateAndStatus(licensePlate, Order.Status.CLOSED);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw BusinessException.builder().ex(e).build();
+            log.error("Error buscando orden: {}", e.getMessage(), e);
+            throw BusinessException.builder().message("Error al buscar orden").ex(e).build();
         }
+
         if (orderFound.isEmpty()) {
-            throw NotFoundException.builder().message("No se encuentra orden para camion con patente " + licensePlate).build();
+            throw NotFoundException.builder()
+                    .message("No se encuentra orden para camion con patente " + licensePlate + " o la misma aun no fue cerrada")
+                    .build();
         }
 
         Order order = orderFound.get();
+
+        if (finalWeight <= order.getInitialWeighing()) {
+            throw BusinessException.builder()
+                    .message("El pesaje final no puede ser menor o igual al pesaje inicial.")
+                    .build();
+        }
+
         order.setFinalWeighing(finalWeight);
-        order.setFinalWeighingDate(new Date(System.currentTimeMillis()));
+        order.setFinalWeighingDate(new Date());
         order.setStatus(Order.Status.REGISTERED_FINAL_WEIGHING);
         orderBusiness.update(order);
 
@@ -85,24 +104,28 @@ public class OrderCli2Business implements IOrderCli2Business {
         float avgDensity = detailBusiness.calculateAverageDensity(order.getId());
         float avgFlow = detailBusiness.calculateAverageFlowRate(order.getId());
         Product product = order.getProduct();
-        
+
+        Map<String, Object> conciliacion = new HashMap<>();
+        conciliacion.put("pesajeInicial", initialWeighing);
+        conciliacion.put("pesajeFinal", finalWeight);
+        conciliacion.put("productoCargado", productLoaded);
+        conciliacion.put("netoPorBalanza", netWeight);
+        conciliacion.put("diferenciaBalanzaCaudalimetro", difference);
+        conciliacion.put("promedioTemperatura", avgTemperature);
+        conciliacion.put("promedioDensidad", avgDensity);
+        conciliacion.put("promedioCaudal", avgFlow);
+        conciliacion.put("producto", product);
+
+        Map<String, Object> respuesta = new LinkedHashMap<>();
+        respuesta.put("mensaje", "Conciliacion de pesajes:");
+        respuesta.put("conciliacion", conciliacion);
+
         try {
-            return PdfGenerator.generateFuelLoadingReconciliationReport(
-                    initialWeighing,
-                    finalWeight,
-                    productLoaded,
-                    netWeight,
-                    difference,
-                    avgTemperature,
-                    avgDensity,
-                    avgFlow,
-                    product
-            );
-        } catch (DocumentException | IOException e) {
-            log.error("Error generando el PDF: {}", e.getMessage(), e);
-            throw BusinessException.builder().message("Error al generar el reporte PDF").ex(e).build();
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsBytes(respuesta);
+        } catch (Exception e) {
+            throw new BusinessException("Error al generar conciliación JSON", e);
         }
-        
     }
-    */
 }
+

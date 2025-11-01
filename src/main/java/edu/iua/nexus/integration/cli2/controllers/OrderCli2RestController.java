@@ -29,4 +29,19 @@ public class OrderCli2RestController extends BaseRestController{
         responseHeaders.set("Order-Id", String.valueOf(order.getId()));
         return new ResponseEntity<>(order.getActivatePassword().toString(), responseHeaders, HttpStatus.OK);
     }
+
+// ENDPOINT 5
+    @SneakyThrows
+    @PostMapping(value = "/final-weighing", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> registerFinalWeighing(
+            @RequestHeader("License-Plate") String licensePlate,
+            @RequestHeader("Final-Weight") float finalWeight) {
+
+        byte[] reconciliation = orderCli2Business.registerFinalWeighing(licensePlate, finalWeight);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "application/json");
+
+        return new ResponseEntity<>(reconciliation, responseHeaders, HttpStatus.OK);
+    }
 }
