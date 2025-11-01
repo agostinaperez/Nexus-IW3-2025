@@ -9,6 +9,7 @@ import edu.iua.nexus.model.business.ConflictException;
 import edu.iua.nexus.model.business.NotFoundException;
 import edu.iua.nexus.model.business.impl.OrderBusiness;
 import edu.iua.nexus.model.repository.OrderRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -52,9 +53,7 @@ public class OrderCli3Business implements IOrderCli3Business {
     public Order receiveDetails(Detail detail) throws NotFoundException, BusinessException, ConflictException {
         Order orderFound = orderBusiness.load(detail.getOrder().getId());
 //validaciones
-        if (orderFound.getStatus() != Order.Status.REGISTERED_INITIAL_WEIGHING) {
-            throw new ConflictException("Estado de orden no válido");
-        }
+        checkOrderStatus(orderFound);
         if (detail.getFlowRate() < 0) {
             throw new BusinessException("Caudal no válido");
         }
@@ -82,5 +81,25 @@ public class OrderCli3Business implements IOrderCli3Business {
         if (order.getStatus() != Order.Status.REGISTERED_INITIAL_WEIGHING) {
             throw new ConflictException("Estado de orden no válido");
         }
+    }
+
+    //Punto 4
+    @Override
+    @Transactional
+    public Order closeOrder(Long orderId) throws BusinessException, NotFoundException, ConflictException {
+        // 1. Cargar la orden usando el business base
+        Order order = orderBusiness.load(orderId); // Throws NotFoundException, BusinessException
+
+        // 2. Validar el estado actual
+        checkOrderStatus(order); // Throws ConflictException
+
+        // 3. Cambiar el estado
+        order.setStatus(Order.Status.CLOSED);
+
+        // 4. Opcional: Anular contraseña de activación
+        order.setActivatePassword(null);
+
+        // 5. Guardar la orden actualizada usando el business base
+        return orderBusiness.update(order); // Throws NotFoundException, BusinessException
     }
 }

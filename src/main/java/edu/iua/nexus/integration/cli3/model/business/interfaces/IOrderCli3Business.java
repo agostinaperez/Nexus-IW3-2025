@@ -12,4 +12,6 @@ public interface IOrderCli3Business {
 
     public Order receiveDetails(Detail detail) throws NotFoundException, BusinessException, FoundException, ConflictException;
 
+    //Punto 4
+    public Order closeOrder(Long orderId) throws BusinessException, NotFoundException, ConflictException;
 }
