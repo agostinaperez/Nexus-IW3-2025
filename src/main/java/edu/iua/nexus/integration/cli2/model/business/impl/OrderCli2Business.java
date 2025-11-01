@@ -2,6 +2,7 @@ package edu.iua.nexus.integration.cli2.model.business.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import edu.iua.nexus.integration.cli2.model.business.interfaces.IOrderCli2Business;
@@ -78,17 +79,11 @@ public class OrderCli2Business implements IOrderCli2Business {
 
         if (orderFound.isEmpty()) {
             throw NotFoundException.builder()
-                    .message("No se encuentra orden para camion con patente " + licensePlate)
+                    .message("No se encuentra orden para camion con patente " + licensePlate + " o la misma aun no fue cerrada")
                     .build();
         }
 
         Order order = orderFound.get();
-
-        if (order.getStatus() == Order.Status.REGISTERED_FINAL_WEIGHING) {
-            throw FoundException.builder()
-                    .message("La orden ya tiene pesaje final registrado")
-                    .build();
-        }
 
         if (finalWeight <= order.getInitialWeighing()) {
             throw BusinessException.builder()
@@ -121,9 +116,13 @@ public class OrderCli2Business implements IOrderCli2Business {
         conciliacion.put("promedioCaudal", avgFlow);
         conciliacion.put("producto", product);
 
+        Map<String, Object> respuesta = new LinkedHashMap<>();
+        respuesta.put("mensaje", "Conciliacion de pesajes:");
+        respuesta.put("conciliacion", conciliacion);
+
         try {
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsBytes(conciliacion);
+            return mapper.writeValueAsBytes(respuesta);
         } catch (Exception e) {
             throw new BusinessException("Error al generar conciliación JSON", e);
         }
