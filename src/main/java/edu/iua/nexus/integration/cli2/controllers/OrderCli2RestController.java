@@ -37,11 +37,24 @@ public class OrderCli2RestController extends BaseRestController{
             @RequestHeader("License-Plate") String licensePlate,
             @RequestHeader("Final-Weight") float finalWeight) {
 
-        byte[] reconciliation = orderCli2Business.registerFinalWeighing(licensePlate, finalWeight);
+        byte[] conciliation = orderCli2Business.registerFinalWeighing(licensePlate, finalWeight);
 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Content-Type", "application/json");
 
-        return new ResponseEntity<>(reconciliation, responseHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(conciliation, responseHeaders, HttpStatus.OK);
+    }
+
+    @SneakyThrows
+    @GetMapping(value = "/conciliation", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getConciliation(
+            @RequestHeader("License-Plate") String licensePlate) {
+
+        byte[] conciliation = orderCli2Business.getConciliation(licensePlate);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Content-Type", "application/json");
+
+        return new ResponseEntity<>(conciliation, responseHeaders, HttpStatus.OK);
     }
 }
