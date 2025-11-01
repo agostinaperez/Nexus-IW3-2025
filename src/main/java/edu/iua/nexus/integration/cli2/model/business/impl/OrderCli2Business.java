@@ -1,7 +1,6 @@
 package edu.iua.nexus.integration.cli2.model.business.impl;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +35,39 @@ public class OrderCli2Business implements IOrderCli2Business {
     @Autowired
     private DetailBusiness detailBusiness;
 
+    private byte[] buildConciliationResponse(Order order, float finalWeight) throws BusinessException {
+    float initialWeighing = order.getInitialWeighing();
+    float productLoaded = order.getLastAccumulatedMass();
+    float netWeight = finalWeight - initialWeighing;
+    float difference = netWeight - productLoaded;
+    float avgTemperature = detailBusiness.calculateAverageTemperature(order.getId());
+    float avgDensity = detailBusiness.calculateAverageDensity(order.getId());
+    float avgFlow = detailBusiness.calculateAverageFlowRate(order.getId());
+    Product product = order.getProduct();
+
+    Map<String, Object> conciliacion = new LinkedHashMap<>();
+    conciliacion.put("pesajeInicial", initialWeighing);
+    conciliacion.put("pesajeFinal", finalWeight);
+    conciliacion.put("productoCargado", productLoaded);
+    conciliacion.put("netoPorBalanza", netWeight);
+    conciliacion.put("diferenciaBalanzaCaudalimetro", difference);
+    conciliacion.put("promedioTemperatura", avgTemperature);
+    conciliacion.put("promedioDensidad", avgDensity);
+    conciliacion.put("promedioCaudal", avgFlow);
+    conciliacion.put("producto", product);
+
+    Map<String, Object> respuesta = new LinkedHashMap<>();
+    respuesta.put("mensaje", "Conciliacion de pesajes:");
+    respuesta.put("conciliacion", conciliacion);
+
+    try {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsBytes(respuesta);
+    } catch (Exception e) {
+        throw new BusinessException("Error al generar conciliación JSON", e);
+    }
+    }
+
 
     @Override
     public Order registerInitialWeighing(String licensePlate, float initialWeight) throws BusinessException, NotFoundException, FoundException {
@@ -64,7 +96,7 @@ public class OrderCli2Business implements IOrderCli2Business {
         return orderFound.get();
     }
 
-    // ENDPONIT 5
+    // ENDPONIT 5.0
     @Override
     public byte[] registerFinalWeighing(String licensePlate, float finalWeight)
             throws BusinessException, NotFoundException, FoundException {
@@ -96,36 +128,36 @@ public class OrderCli2Business implements IOrderCli2Business {
         order.setStatus(Order.Status.REGISTERED_FINAL_WEIGHING);
         orderBusiness.update(order);
 
-        float initialWeighing = order.getInitialWeighing();
-        float productLoaded = order.getLastAccumulatedMass();
-        float netWeight = finalWeight - initialWeighing;
-        float difference = netWeight - productLoaded;
-        float avgTemperature = detailBusiness.calculateAverageTemperature(order.getId());
-        float avgDensity = detailBusiness.calculateAverageDensity(order.getId());
-        float avgFlow = detailBusiness.calculateAverageFlowRate(order.getId());
-        Product product = order.getProduct();
-
-        Map<String, Object> conciliacion = new HashMap<>();
-        conciliacion.put("pesajeInicial", initialWeighing);
-        conciliacion.put("pesajeFinal", finalWeight);
-        conciliacion.put("productoCargado", productLoaded);
-        conciliacion.put("netoPorBalanza", netWeight);
-        conciliacion.put("diferenciaBalanzaCaudalimetro", difference);
-        conciliacion.put("promedioTemperatura", avgTemperature);
-        conciliacion.put("promedioDensidad", avgDensity);
-        conciliacion.put("promedioCaudal", avgFlow);
-        conciliacion.put("producto", product);
-
-        Map<String, Object> respuesta = new LinkedHashMap<>();
-        respuesta.put("mensaje", "Conciliacion de pesajes:");
-        respuesta.put("conciliacion", conciliacion);
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsBytes(respuesta);
-        } catch (Exception e) {
-            throw new BusinessException("Error al generar conciliación JSON", e);
-        }
+        return buildConciliationResponse(order, finalWeight);
     }
+
+    // ENDPONIT 5.1
+    @Override
+    public byte[] getConciliation(String licensePlate)
+            throws BusinessException, NotFoundException {
+
+    Optional<Order> orderFound;
+    try {
+        orderFound = orderDAO.findByTruck_LicensePlateAndStatus(
+                licensePlate, Order.Status.REGISTERED_FINAL_WEIGHING);
+    } catch (Exception e) {
+        log.error("Error buscando orden: {}", e.getMessage(), e);
+        throw BusinessException.builder()
+                .message("Error al buscar orden para conciliación")
+                .ex(e)
+                .build();
+    }
+
+    if (orderFound.isEmpty()) {
+        throw NotFoundException.builder()
+                .message("No se encuentra orden en estado 4 para la patente " + licensePlate)
+                .build();
+    }
+
+    Order order = orderFound.get();
+
+    return buildConciliationResponse(order, order.getFinalWeighing());
+    }
+
 }
 
