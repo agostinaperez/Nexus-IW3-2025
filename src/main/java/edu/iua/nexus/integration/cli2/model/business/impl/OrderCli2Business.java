@@ -1,7 +1,6 @@
 package edu.iua.nexus.integration.cli2.model.business.impl;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -67,7 +66,7 @@ public class OrderCli2Business implements IOrderCli2Business {
     } catch (Exception e) {
         throw new BusinessException("Error al generar conciliación JSON", e);
     }
-}
+    }
 
 
     @Override
