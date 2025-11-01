@@ -150,7 +150,7 @@ public class OrderCli2Business implements IOrderCli2Business {
 
     if (orderFound.isEmpty()) {
         throw NotFoundException.builder()
-                .message("No se encuentra orden en estado 4 para la patente " + licensePlate + " o la misma aun no fue cerrada")
+                .message("No se encuentra orden en estado 4 para la patente " + licensePlate)
                 .build();
     }
 
