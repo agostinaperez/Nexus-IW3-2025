@@ -2,7 +2,7 @@ package edu.iua.nexus;
 
 import org.springframework.core.env.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,8 +26,8 @@ public class NexusApplication extends SpringBootServletInitializer implements Co
 		SpringApplication.run(NexusApplication.class, args);
 	}
 
-	@Value("${spring.profiles.active}")
-	private String profile;
+	//@Value("${spring.profiles.active}")
+	//private String profile;
 
 	@Override
 	public void run(String... args) throws Exception {
