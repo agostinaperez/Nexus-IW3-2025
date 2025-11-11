@@ -7,6 +7,12 @@ import edu.iua.nexus.model.serializers.OrderSlimJsonSerializer;
 import edu.iua.nexus.util.FieldValidator;
 import edu.iua.nexus.util.JsonUtils;
 import edu.iua.nexus.util.PaginationInfo;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -27,7 +33,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+@Tag(name = "Órdenes (Frontend)", description = "Endpoints para la UI interna (Monitoreo, listado y detalle de órdenes).")
 @RestController
 @RequestMapping(Constants.URL_ORDERS)
 public class OrderRestController extends BaseRestController {
@@ -36,6 +42,15 @@ public class OrderRestController extends BaseRestController {
     private IOrderBusiness orderBusiness;
 
     /* ENPOINT PARA OBTENER UNA LISTA DE ORDENES (PAGINABLE) */
+     @Operation(
+        summary = "Listar órdenes (Paginado)",
+        description = "Obtiene una lista paginada de todas las órdenes, con filtros y ordenamiento. Para el frontend."
+    )
+    @Parameter(name = "page", description = "Número de página (empieza en 0)", in = ParameterIn.QUERY, example = "0")
+    @Parameter(name = "size", description = "Tamaño de la página", in = ParameterIn.QUERY, example = "10")
+    @Parameter(name = "filter", description = "Filtro por estado(s), separado por comas (ej: RECEIVED,CLOSED)", in = ParameterIn.QUERY)
+    @Parameter(name = "sort", description = "Campo para ordenar (ej: 'id,asc' o 'externalReceptionDate,desc')", in = ParameterIn.QUERY, example = "id,desc")
+    @ApiResponse(responseCode = "200", description = "Página de órdenes obtenida")
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_OPERATOR')")
     @SneakyThrows
@@ -96,6 +111,15 @@ public class OrderRestController extends BaseRestController {
 
 
     /* ENPOINT PARA OBTENER EL DETALLE DE UNA ORDEN POR SU ID */
+    // --- Documentación de Swagger ---
+    @Operation(
+        summary = "Obtener detalle de una Orden por ID",
+        description = "Devuelve todos los datos de una orden específica, serializada con `OrderSlimJsonSerializer.serializeOrderDetail`."
+    )
+    @Parameter(name = "id", description = "ID interno de la orden", in = ParameterIn.PATH, required = true, example = "102")
+    @ApiResponse(responseCode = "200", description = "Orden encontrada")
+    @ApiResponse(responseCode = "404", description = "Orden no encontrada")
+    // --- Fin de la Documentación ---
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_OPERATOR')")
     @SneakyThrows

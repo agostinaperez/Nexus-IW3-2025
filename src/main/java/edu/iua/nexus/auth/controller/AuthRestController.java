@@ -6,6 +6,11 @@ import java.util.Map;
 
 import edu.iua.nexus.auth.util.UserSlimV1Response;
 import edu.iua.nexus.util.JsonUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +33,7 @@ import edu.iua.nexus.auth.model.serializers.UserSlimV1JsonSerializer;
 import edu.iua.nexus.controllers.BaseRestController;
 import edu.iua.nexus.Constants;
 import edu.iua.nexus.util.IStandartResponseBusiness;
-
+@Tag(name = "Autenticación", description = "Endpoints de Login y validación de token.")
 @RestController
 public class AuthRestController extends BaseRestController {
 
@@ -41,9 +46,12 @@ public class AuthRestController extends BaseRestController {
     @Autowired
     private PasswordEncoder pEncoder;
 
-    /**
-     * Punto de acceso diseñado para integraciones externas que únicamente requieren un JWT (JSON WEB TOKEN).
-     */
+    /* Punto de acceso diseñado para integraciones externas que únicamente requieren
+    un JWT (JSON WEB TOKEN).*/
+    // --- Documentación de Swagger ---
+    @Operation(summary = "Login Externo (Sistemas)", description = "Login para sistemas externos (CLI1, CLI2, CLI3). Devuelve solo el token JWT.")
+    @ApiResponse(responseCode = "200", description = "Login exitoso", content = @Content(mediaType = "text/plain", schema = @Schema(type = "string", example = "eyJhbGciOi...")))
+    // --- Fin de la Documentación ---
     @PostMapping(value = Constants.URL_EXTERNAL_LOGIN, produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<?> loginExternalOnlyToken(@RequestParam String username, @RequestParam String password) {
         Authentication auth = null;
@@ -70,11 +78,17 @@ public class AuthRestController extends BaseRestController {
         return new ResponseEntity<String>(token, HttpStatus.OK);
     }
 
-    @SneakyThrows
-    /**
+    // --- Documentación de Swagger ---
+
+
+  /**
      * Endpoint usado por la UI interna: devuelve el token y una representación ligera del usuario
      * para poblar el store del front sin exponer datos sensibles.
      */
+    @Operation(summary = "Login Interno (Frontend)", description = "Login para la interfaz gráfica (Frontend). Devuelve el token JWT y un objeto 'user' reducido.")
+    @ApiResponse(responseCode = "200", description = "Login exitoso", content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"token\":\"eyJhbGciOi...\", \"user\":{\"username\":\"admin\",\"email\":\"admin@mail.com\",\"roles\":[\"ROLE_ADMIN\"]}}")))
+    // --- Fin de la Documentación ---
+    @SneakyThrows
     @PostMapping(value = Constants.URL_INTERNAL_LOGIN, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginInternal(@RequestBody User user) {
         Authentication auth = null;
@@ -115,10 +129,20 @@ public class AuthRestController extends BaseRestController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @SneakyThrows
     /**
      * Permite a un cliente validar el token vigente y recuperar sus propios datos en formato slim.
      */
+     // --- Documentación de Swagger ---
+
+
+    @Operation(
+        summary = "Validar Token",
+        description = "Endpoint protegido para validar un token existente. Devuelve los datos del usuario (formato 'slim')."
+    )
+    @ApiResponse(responseCode = "200", description = "Token válido. Devuelve datos del usuario.")
+    @ApiResponse(responseCode = "401", description = "Token inválido o expirado.")
+    // --- Fin de la Documentación ---
+    @SneakyThrows
     @GetMapping(value = Constants.URL_TOKEN_VALIDATE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> validateToken() {
         User user = getUserLogged();
