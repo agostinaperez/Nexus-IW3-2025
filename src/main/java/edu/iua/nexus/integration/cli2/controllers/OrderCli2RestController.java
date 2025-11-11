@@ -1,5 +1,14 @@
 package edu.iua.nexus.integration.cli2.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import edu.iua.nexus.Constants;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,17 +16,8 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import edu.iua.nexus.controllers.BaseRestController;
-import edu.iua.nexus.integration.cli2.model.business.impl.OrderCli2Business;
+import edu.iua.nexus.integration.cli2.model.business.interfaces.IOrderCli2Business;
 import edu.iua.nexus.model.Order;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @Tag(name = "Cliente 2 - Balanza (TMS)", description = "Endpoints para el Punto 2 (Pesaje Inicial) y Punto 5 (Pesaje Final).")
 @RestController
@@ -26,7 +26,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class OrderCli2RestController extends BaseRestController{
     
     @Autowired
-    private OrderCli2Business orderCli2Business;
+    private IOrderCli2Business orderCli2Business;
+    // --- Documentación de Swagger ---
     @Operation(
         summary = "Punto 2: Registrar Pesaje Inicial",
         description = "Registra la tara (peso inicial) del camión y genera la contraseña de activación."
@@ -55,6 +56,7 @@ public class OrderCli2RestController extends BaseRestController{
         @ApiResponse(responseCode = "403", description = "Prohibido (Token no tiene rol CLI2 o ADMIN)"),
         @ApiResponse(responseCode = "404", description = "Orden no encontrada para esa patente y estado 'RECEIVED'")
     })
+    // --- Fin de la Documentación ---
     @SneakyThrows
     @PostMapping(value = "/initial-weighing", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<?> registerInitialWeighing(
@@ -67,6 +69,7 @@ public class OrderCli2RestController extends BaseRestController{
     }
 
 // ENDPOINT 5
+    @SneakyThrows
     // --- Documentación de Swagger ---
     @Operation(
         summary = "Punto 5: Registrar Pesaje Final y obtener Conciliación",
@@ -98,7 +101,6 @@ public class OrderCli2RestController extends BaseRestController{
         @ApiResponse(responseCode = "400", description = "El peso final es menor o igual al inicial")
     })
     // --- Fin de la Documentación ---
-    @SneakyThrows
     @PostMapping(value = "/final-weighing", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerFinalWeighing(
             @RequestHeader("License-Plate") String licensePlate,
@@ -112,6 +114,7 @@ public class OrderCli2RestController extends BaseRestController{
         return new ResponseEntity<>(conciliation, responseHeaders, HttpStatus.OK);
     }
 
+    @SneakyThrows
     // --- Documentación de Swagger ---
     @Operation(
         summary = "Punto 5: Obtener Conciliación (ya finalizada)",
@@ -135,7 +138,6 @@ public class OrderCli2RestController extends BaseRestController{
         @ApiResponse(responseCode = "404", description = "Orden no encontrada en estado 4 para esa patente")
     })
     // --- Fin de la Documentación ---
-    @SneakyThrows
     @GetMapping(value = "/conciliation", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getConciliation(
             @RequestHeader("License-Plate") String licensePlate) {
