@@ -78,9 +78,8 @@ public class Order {
     @OneToMany(mappedBy = "order")
     private Set<Detail> details;
 
-    //no voy a hacer esto todavia pq es para el final
-    //@OneToMany(mappedBy = "order")
-    //private Set<Alarm> alarms;
+    @OneToMany(mappedBy = "order")
+    private Set<Alarm> alarms;
 
     // fechas y horas de los eventos durante el proceso
     private Date estimatedDate;
