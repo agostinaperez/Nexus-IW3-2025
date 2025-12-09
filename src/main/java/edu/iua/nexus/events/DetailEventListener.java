@@ -15,15 +15,15 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class DetailEventListener implements ApplicationListener<DetailEvent> {
 
+    @Autowired
+    IDetailCli3Business detailBusiness;
+
     @Override
     public void onApplicationEvent(DetailEvent event) {
         if (event.getTypeEvent().equals(DetailEvent.TypeEvent.SAVE_DETAIL) && event.getSource() instanceof Detail) {
             handleSaveDetail((Detail) event.getSource());
         }
     }
-
-    @Autowired
-    IDetailCli3Business detailBusiness;
 
     private void handleSaveDetail(Detail detail) {
         try {

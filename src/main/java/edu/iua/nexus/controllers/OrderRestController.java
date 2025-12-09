@@ -1,7 +1,10 @@
 package edu.iua.nexus.controllers;
 
 import edu.iua.nexus.Constants;
+import edu.iua.nexus.auth.model.User;
+import edu.iua.nexus.model.Alarm;
 import edu.iua.nexus.model.Order;
+import edu.iua.nexus.model.business.interfaces.IAlarmBusiness;
 import edu.iua.nexus.model.business.interfaces.IOrderBusiness;
 import edu.iua.nexus.model.serializers.OrderSlimJsonSerializer;
 import edu.iua.nexus.util.FieldValidator;
@@ -22,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +44,9 @@ public class OrderRestController extends BaseRestController {
 
     @Autowired
     private IOrderBusiness orderBusiness;
+
+    @Autowired
+    private IAlarmBusiness alarmBusiness;
 
     /* ENPOINT PARA OBTENER UNA LISTA DE ORDENES (PAGINABLE) */
      @Operation(
@@ -143,5 +150,36 @@ public class OrderRestController extends BaseRestController {
         } catch (IOException e) {
             throw new RuntimeException("Error al serializar el objeto Order", e);
         }
+    }
+
+    @GetMapping("/conciliation/{idOrder}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_OPERATOR')  or hasRole('ROLE_CLI1') or hasRole('ROLE_CLI2') or hasRole('ROLE_CLI3')")
+    @SneakyThrows
+    public ResponseEntity<?> getConciliationReport(@PathVariable("idOrder") Long idOrder,
+                                                   @RequestHeader(value = HttpHeaders.ACCEPT,
+                                                           defaultValue = MediaType.APPLICATION_PDF_VALUE)
+                                                   String acceptHeader) {
+        // Respuesta en JSON
+        if (acceptHeader.equals(MediaType.APPLICATION_JSON_VALUE)) {
+            Map<String, Object> conciliationData = orderBusiness.getConciliationJson(idOrder);
+            return new ResponseEntity<>(conciliationData, HttpStatus.OK);
+        }
+        // Respuesta en PDF
+        byte[] pdfContent = orderBusiness.getConciliationPdf(idOrder);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"fuel-conciliation.pdf\"");
+        return new ResponseEntity<>(pdfContent, headers, HttpStatus.OK);
+    }
+
+    @SneakyThrows
+    @PostMapping("/set-alarm-status")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_OPERATOR')")
+    public ResponseEntity<?> setAlarmStatus(@RequestBody Alarm alarm, @RequestParam Alarm.Status newStatus) {
+        User user = getUserLogged();
+        Order order = alarmBusiness.setAlarmStatus(alarm, user, newStatus);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Location", Constants.URL_ORDERS + "/orders/set-alarm-status/" + order.getId());
+        return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
     }
 }

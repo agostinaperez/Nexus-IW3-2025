@@ -1,8 +1,7 @@
 package edu.iua.nexus.integration.cli2.model.business.impl;
 
+import java.io.IOException;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 import edu.iua.nexus.integration.cli2.model.business.interfaces.IOrderCli2Business;
 import edu.iua.nexus.model.Order;
@@ -14,10 +13,12 @@ import edu.iua.nexus.model.business.impl.DetailBusiness;
 import edu.iua.nexus.model.business.interfaces.IOrderBusiness;
 import edu.iua.nexus.model.repository.OrderRepository;
 import edu.iua.nexus.util.ActivationPasswordGenerator;
+import edu.iua.nexus.util.PdfGenerator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.text.DocumentException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +36,7 @@ public class OrderCli2Business implements IOrderCli2Business {
     @Autowired
     private DetailBusiness detailBusiness;
 
-    private byte[] buildConciliationResponse(Order order, float finalWeight) throws BusinessException {
+    private byte[] buildConciliationResponse(Order order, float finalWeight) throws BusinessException, NotFoundException, FoundException {
     float initialWeighing = order.getInitialWeighing();
     float productLoaded = order.getLastAccumulatedMass();
     float netWeight = finalWeight - initialWeighing;
@@ -45,27 +46,24 @@ public class OrderCli2Business implements IOrderCli2Business {
     float avgFlow = detailBusiness.calculateAverageFlowRate(order.getId());
     Product product = order.getProduct();
 
-    Map<String, Object> conciliacion = new LinkedHashMap<>();
-    conciliacion.put("pesajeInicial", initialWeighing);
-    conciliacion.put("pesajeFinal", finalWeight);
-    conciliacion.put("productoCargado", productLoaded);
-    conciliacion.put("netoPorBalanza", netWeight);
-    conciliacion.put("diferenciaBalanzaCaudalimetro", difference);
-    conciliacion.put("promedioTemperatura", avgTemperature);
-    conciliacion.put("promedioDensidad", avgDensity);
-    conciliacion.put("promedioCaudal", avgFlow);
-    conciliacion.put("producto", product);
-
-    Map<String, Object> respuesta = new LinkedHashMap<>();
-    respuesta.put("mensaje", "Conciliacion de pesajes:");
-    respuesta.put("conciliacion", conciliacion);
-
-    try {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsBytes(respuesta);
-    } catch (Exception e) {
-        throw new BusinessException("Error al generar conciliación JSON", e);
-    }
+     try {
+            byte[] conciliation = PdfGenerator.generateFuelLoadingReconciliationReport(
+                    initialWeighing,
+                    finalWeight,
+                    productLoaded,
+                    netWeight,
+                    difference,
+                    avgTemperature,
+                    avgDensity,
+                    avgFlow,
+                    product
+            );
+            orderBusiness.update(order);
+            return conciliation;
+        } catch (DocumentException | IOException e) {
+            log.error("Error generando el PDF: {}", e.getMessage(), e);
+            throw BusinessException.builder().message("Error al generar el reporte PDF").ex(e).build();
+        }
     }
 
 
@@ -134,7 +132,7 @@ public class OrderCli2Business implements IOrderCli2Business {
     // ENDPONIT 5.1
     @Override
     public byte[] getConciliation(String licensePlate)
-            throws BusinessException, NotFoundException {
+            throws BusinessException, NotFoundException, FoundException {
 
     Optional<Order> orderFound;
     try {

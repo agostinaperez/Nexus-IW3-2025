@@ -15,5 +15,5 @@ public interface IOrderCli2Business {
     byte[] registerFinalWeighing(String orderNumber, float finalWeight) throws BusinessException, NotFoundException, FoundException, ConflictException;
 
     //ENDPOINT 5.1
-    byte[] getConciliation(String licensePlate) throws BusinessException, NotFoundException;
+    byte[] getConciliation(String licensePlate) throws BusinessException, NotFoundException, FoundException;
 }

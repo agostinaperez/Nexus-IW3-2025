@@ -1,5 +1,6 @@
 package edu.iua.nexus.integration.cli3.model.business.impl;
 
+import edu.iua.nexus.events.AlarmEvent;
 import edu.iua.nexus.events.DetailEvent;
 import edu.iua.nexus.integration.cli3.model.business.interfaces.IOrderCli3Business;
 import edu.iua.nexus.model.Detail;
@@ -7,12 +8,15 @@ import edu.iua.nexus.model.Order;
 import edu.iua.nexus.model.business.BusinessException;
 import edu.iua.nexus.model.business.ConflictException;
 import edu.iua.nexus.model.business.NotFoundException;
+import edu.iua.nexus.model.business.impl.AlarmBusiness;
 import edu.iua.nexus.model.business.impl.OrderBusiness;
 import edu.iua.nexus.model.repository.OrderRepository;
+import edu.iua.nexus.websockets.wrappers.DetailWsWrapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -30,6 +34,12 @@ public class OrderCli3Business implements IOrderCli3Business {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private AlarmBusiness alarmBusiness;
+
+    @Autowired
+    private SimpMessagingTemplate wSock;
 
     @Override
     public Order validatePassword(int password) throws NotFoundException, BusinessException, ConflictException {
@@ -60,6 +70,11 @@ public class OrderCli3Business implements IOrderCli3Business {
         if (detail.getAccumulatedMass() < orderFound.getLastAccumulatedMass()) {
             throw new BusinessException("Masa acumulada no válida");
         }
+        if (detail.getTemperature() > orderFound.getProduct().getThresholdTemperature()) {
+            if (!alarmBusiness.isAlarmAccepted(orderFound.getId())) {
+                applicationEventPublisher.publishEvent(new AlarmEvent(detail, AlarmEvent.TypeEvent.TEMPERATURE_EXCEEDED));
+            }
+        }
 
         Date currentTime = new Date(System.currentTimeMillis());
         // Actualizacion de cabecera de la orden
@@ -69,6 +84,15 @@ public class OrderCli3Business implements IOrderCli3Business {
         orderFound.setLastTemperature(detail.getTemperature());
         orderFound.setLastFlowRate(detail.getFlowRate());
         orderDAO.save(orderFound);
+
+        DetailWsWrapper detailWsWrapper = new DetailWsWrapper();
+         // todo topico para graficos en tiempo real
+        detailWsWrapper.setTimeStamp(currentTime);
+        detailWsWrapper.setAccumulatedMass(detail.getAccumulatedMass());
+        detailWsWrapper.setDensity(detail.getDensity());
+        detailWsWrapper.setTemperature(detail.getTemperature());
+        detailWsWrapper.setFlowRate(detail.getFlowRate());
+        wSock.convertAndSend("/topic/details/graphs/order/" + orderFound.getId(), detailWsWrapper);
 
         // Evento para manejar el almacenamiento de detalle
         applicationEventPublisher.publishEvent(new DetailEvent(detail, DetailEvent.TypeEvent.SAVE_DETAIL));

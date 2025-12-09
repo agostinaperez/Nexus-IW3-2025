@@ -2,6 +2,8 @@ package edu.iua.nexus.model.serializers;
 
 import edu.iua.nexus.model.Order;
 import edu.iua.nexus.model.Tank;
+import edu.iua.nexus.util.OrderUtils;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -29,13 +31,19 @@ public class OrderSlimJsonSerializer extends StdSerializer<Order> {
 
         // Objeto "client"
         jsonGenerator.writeObjectFieldStart("client");
-        jsonGenerator.writeStringField("businessName", order.getClient().getName());
+        jsonGenerator.writeStringField("name", order.getClient().getName());
         jsonGenerator.writeEndObject();
 
         // Campo de fechas y estado
         jsonGenerator.writeStringField("receptionDate", order.getExternalReceptionDate().toString());
         jsonGenerator.writeStringField("estimatedDate", order.getEstimatedDate().toString());
         jsonGenerator.writeStringField("status", order.getStatus().toString());
+
+         // Estado de alarmas
+        String alarmStatus = OrderUtils.getAlarmStatus(order);
+        jsonGenerator.writeObjectFieldStart("alarmStatus");
+        jsonGenerator.writeStringField("state", alarmStatus);
+        jsonGenerator.writeEndObject();
 
         jsonGenerator.writeEndObject();
     }
@@ -69,7 +77,7 @@ public class OrderSlimJsonSerializer extends StdSerializer<Order> {
 
         // Objeto "client"
         jsonGenerator.writeObjectFieldStart("client");
-        jsonGenerator.writeStringField("businessName", order.getClient().getName());
+        jsonGenerator.writeStringField("name", order.getClient().getName());
         jsonGenerator.writeEndObject();
 
         // Obejto "driver"
