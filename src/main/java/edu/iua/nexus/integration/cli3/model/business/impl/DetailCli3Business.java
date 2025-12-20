@@ -55,7 +55,6 @@ public class DetailCli3Business implements IDetailCli3Business {
             if (checkFrequency(currentTime, lastTimeStamp)) {
                 // Solo persisto el detail si pasó el intervalo mínimo configurado en application.properties
                 detail.setTimeStamp(new Date(currentTime));
-                detailBusiness.add(detail);
                 Detail savedDetail = detailBusiness.add(detail);
                 orderFound.setFuelingEndDate(new Date(currentTime));
                 orderBusiness.update(orderFound);

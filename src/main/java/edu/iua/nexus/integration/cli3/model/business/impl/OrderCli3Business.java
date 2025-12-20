@@ -95,6 +95,7 @@ public class OrderCli3Business implements IOrderCli3Business {
         wSock.convertAndSend("/topic/details/graphs/order/" + orderFound.getId(), detailWsWrapper);
 
         // Evento para manejar el almacenamiento de detalle
+        log.info("Before publish: detail.id={}" + detail.getId()+ "hash: "+ System.identityHashCode(detail));
         applicationEventPublisher.publishEvent(new DetailEvent(detail, DetailEvent.TypeEvent.SAVE_DETAIL));
 
         return orderFound;

@@ -98,6 +98,7 @@ public class OrderCli3RestController {
     @PostMapping("/detail")
     public ResponseEntity<?> receiveLoadData(@RequestBody Detail detail) {
         log.info("REST request to receive detail for CLI3 Order");
+        log.info("Controller: detail.id=" + detail.getId() + ", hash=" + System.identityHashCode(detail));
         Order order = orderCli3Business.receiveDetails(detail);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Order-Id", String.valueOf(order.getId()));

@@ -27,6 +27,11 @@ public class DetailEventListener implements ApplicationListener<DetailEvent> {
 
     private void handleSaveDetail(Detail detail) {
         try {
+            log.info("Listener: detail.id={}, hash={}, listenerHash={}",
+            detail.getId(),
+            System.identityHashCode(detail),
+            System.identityHashCode(this));
+
             detailBusiness.add(detail);
         } catch (FoundException e) {
             log.error("El detalle con id={} ya existe", detail.getId(), e);

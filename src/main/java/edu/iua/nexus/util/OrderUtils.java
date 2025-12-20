@@ -27,10 +27,10 @@ public class OrderUtils {
         }
 
         if (hasConfirmedIssue) {
-            return "Problema";
+            return "CONFIRMED_ISSUE";
         }
         if (hasPendingReview) {
-            return "Pendiente";
+            return "PENDING";
         }
         return "Sin alarmas";
     }

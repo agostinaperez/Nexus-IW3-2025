@@ -102,7 +102,7 @@ public class DetailRestController extends BaseRestController {
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_OPERATOR')")
     @SneakyThrows
-    public ResponseEntity<?> getAllAlarms(@RequestParam Long idOrder) {
+    public ResponseEntity<?> getAllDetails(@RequestParam Long idOrder) {
         Order order = orderBusiness.load(idOrder);
         List<Detail> details = detailBusiness.listByOrder(order.getId());
         StdSerializer<Detail> detailSerializer = new DetailSlimV1JsonSerializer(Detail.class, false);
