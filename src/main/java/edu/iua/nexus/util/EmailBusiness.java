@@ -1,6 +1,7 @@
 package edu.iua.nexus.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -14,11 +15,14 @@ public class EmailBusiness {
     @Autowired
     private JavaMailSender emailSender;
 
+    @Value("${mail.from:${spring.mail.username}}")
+    private String from;
+
     public void sendSimpleMessage(String to, String subject, String text) throws BusinessException {
         log.trace("Enviando mail subject={} a: {}", subject, to);
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("noreply@lpn.com.ar");
+            message.setFrom(from);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(text);
