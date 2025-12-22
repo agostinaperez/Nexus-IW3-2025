@@ -21,6 +21,12 @@ import java.util.Date;
 @Component
 public class AlarmEventListener implements ApplicationListener<AlarmEvent> {
 
+    /**
+     * Escucha eventos de tipo {@link AlarmEvent} y coordina las acciones que deben dispararse
+     * cuando una alarma de temperatura es reportada. El flujo principal crea la alarma en base
+     * de datos, notifica a los clientes conectados via WebSocket y envia un correo de alerta al
+     * destinatario configurado.
+     */
     @Override
     public void onApplicationEvent(AlarmEvent event) {
         if (event.getTypeEvent().equals(AlarmEvent.TypeEvent.TEMPERATURE_EXCEEDED) && event.getSource() instanceof Detail) {
@@ -40,6 +46,14 @@ public class AlarmEventListener implements ApplicationListener<AlarmEvent> {
     @Value("${mail.temperature.exceeded.send.to}")
     private String to;
 
+    /**
+     * Procesa el evento de temperatura excedida en tres pasos:
+     * <ol>
+     *     <li>Persistir la alarma con estado {@code PENDING} asociada a la orden.</li>
+     *     <li>Enviar la alarma a clientes suscritos al topic {@code /topic/alarms/order/{orderId}}.</li>
+     *     <li>Notificar por correo usando los datos del {@link Detail} que disparo el evento.</li>
+     * </ol>
+     */
     private void handleTemperatureExceeded(Detail detail) {
         Date now = new Date(System.currentTimeMillis());
 

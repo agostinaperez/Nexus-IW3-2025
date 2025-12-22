@@ -19,6 +19,22 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Capa de negocio para la entidad {@link Alarm}. Centraliza la persistencia de alarmas y la
+ * sincronizacion de estado con otros componentes del dominio. Todas las operaciones exponen
+ * excepciones checked para que las capas superiores manejen de forma explicita errores de
+ * validacion o problemas al acceder a la base de datos.
+ *
+ * Flujo general:
+ * <ul>
+ *   <li>Los metodos {@code list}, {@code load} y {@code getAllAlarmsByOrder} son lecturas
+ *   directas al repositorio, envolviendo cualquier error en {@link BusinessException}.</li>
+ *   <li>{@code add} y {@code update} validan la existencia previa y delegan el guardado al
+ *   {@link AlarmRepository}, dejando registro en logs si algo falla.</li>
+ *   <li>{@code setAlarmStatus} coordina la actualizacion de una alarma y su orden asociada,
+ *   aplicando reglas de negocio que impiden cambios en estados no permitidos.</li>
+ * </ul>
+ */
 @Service
 @Slf4j
 public class AlarmBusiness implements IAlarmBusiness {
@@ -73,6 +89,8 @@ public class AlarmBusiness implements IAlarmBusiness {
     @Override
     public Alarm add(Alarm alarm) throws FoundException, BusinessException {
 
+        // Se valida dos veces la existencia para mantener compatibilidad con logica previa:
+        // si ya existe una alarma con el mismo id se informa el conflicto al caller.
         try {
             load(alarm.getId());
             throw FoundException.builder().message("Ya existe la Alarma id = " + alarm.getId()).build();
@@ -138,6 +156,11 @@ public class AlarmBusiness implements IAlarmBusiness {
 
     @Override
     public Order setAlarmStatus(Alarm alarm, User user, Alarm.Status newStatus) throws BusinessException, NotFoundException, ConflictException {
+        // Flujo principal de cambio de estado:
+        // 1. Se obtiene la alarma y la orden actual para garantizar que existen.
+        // 2. Se valida que la alarma siga pendiente y la orden siga en etapa de carga.
+        // 3. Solo se aceptan transiciones a ACKNOWLEDGED o CONFIRMED_ISSUE.
+        // 4. Se actualizan observaciones y usuario responsable, luego se persiste.
         Alarm alarmFound = load(alarm.getId());
         Order orderFound = orderBusiness.load(alarmFound.getOrder().getId());
 

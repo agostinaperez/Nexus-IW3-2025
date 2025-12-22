@@ -54,7 +54,10 @@ public class SecurityConfiguration {
         CorsConfiguration config = new CorsConfiguration();
 
         // FRONTEND URL (Vite)
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of(
+        "http://localhost:5173",
+        "https://agostinaiw3.chickenkiller.com"
+        ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
@@ -82,14 +85,15 @@ public class SecurityConfiguration {
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
 
                 .exceptionHandling(e -> e.accessDeniedHandler(accessDeniedHandler))
 
-                .httpBasic(Customizer.withDefaults())
-
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );

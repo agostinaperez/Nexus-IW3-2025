@@ -15,6 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class DetailEventListener implements ApplicationListener<DetailEvent> {
 
+    /**
+     * Escucha eventos de {@link DetailEvent} y se encarga de persistir los detalles que llegan
+     * desde los integradores CLI3. La logica se restringe a validar el tipo de evento y delegar
+     * el guardado al servicio {@link IDetailCli3Business}, dejando trazabilidad en logs en caso
+     * de error o duplicados.
+     */
     @Autowired
     IDetailCli3Business detailBusiness;
 
@@ -25,6 +31,11 @@ public class DetailEventListener implements ApplicationListener<DetailEvent> {
         }
     }
 
+    /**
+     * Intenta guardar el {@link Detail} recibido, logueando los casos en que el detalle ya existe
+     * o cuando la capa de negocio informa errores. Se mantiene la traza del hash de los objetos
+     * para facilitar depuracion cuando se emiten multiples eventos.
+     */
     private void handleSaveDetail(Detail detail) {
         try {
             log.info("Listener: detail.id={}, hash={}, listenerHash={}",
