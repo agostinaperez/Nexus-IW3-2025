@@ -1,7 +1,6 @@
 package edu.iua.nexus.auth.controller;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Map;
 
 import edu.iua.nexus.auth.util.UserSlimV1Response;
@@ -73,7 +72,6 @@ public class AuthRestController extends BaseRestController {
                 .withClaim("roles", new ArrayList<String>(user.getAuthoritiesStr()))
                 .withClaim("email", user.getEmail())
                 .withClaim("version", "1.0.0")
-                .withExpiresAt(new Date(System.currentTimeMillis() + AuthConstants.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(AuthConstants.SECRET.getBytes()));
         return new ResponseEntity<String>(token, HttpStatus.OK);
     }
@@ -110,7 +108,6 @@ public class AuthRestController extends BaseRestController {
                 .withClaim("roles", new ArrayList<String>(newUser.getAuthoritiesStr()))
                 .withClaim("email", newUser.getEmail())
                 .withClaim("version", "1.0.0")
-                .withExpiresAt(new Date(System.currentTimeMillis() + AuthConstants.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(AuthConstants.SECRET.getBytes()));
 
         // Crear la respuesta simplificada del usuario

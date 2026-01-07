@@ -71,7 +71,7 @@ public class OrderCli3Business implements IOrderCli3Business {
             throw new BusinessException("Masa acumulada no válida");
         }
         if (detail.getTemperature() > orderFound.getProduct().getThresholdTemperature()) {
-            if (!alarmBusiness.isAlarmAccepted(orderFound.getId())) {
+            if (!alarmBusiness.pendingAlarmExists(orderFound.getId())) {
                 applicationEventPublisher.publishEvent(new AlarmEvent(detail, AlarmEvent.TypeEvent.TEMPERATURE_EXCEEDED));
             }
         }

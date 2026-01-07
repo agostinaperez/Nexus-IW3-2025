@@ -23,7 +23,7 @@ public interface IAlarmBusiness {
 
     Alarm update(Alarm alarm) throws NotFoundException, BusinessException;
 
-    Boolean isAlarmAccepted(Long orderId) throws BusinessException;
+    Boolean pendingAlarmExists(Long orderId) throws BusinessException;
 
     List<Alarm> pendingReview() throws NotFoundException;
 

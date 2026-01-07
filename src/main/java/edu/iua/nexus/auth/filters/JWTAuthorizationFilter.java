@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import edu.iua.nexus.auth.model.Role;
@@ -101,8 +102,10 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 					//el principal es el user
 					return new UsernamePasswordAuthenticationToken(user, null, authorities);
 				}
+			} catch (TokenExpiredException e) {
+				log.info("Token expirado: {}", e.getMessage());
 			} catch (Exception e) {
-				log.error(e.getMessage());
+				log.error("Error al validar token", e);
 			}
 			
 			

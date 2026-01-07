@@ -123,7 +123,7 @@ public class AlarmBusiness implements IAlarmBusiness {
     }
 
     @Override
-    public Boolean isAlarmAccepted(Long orderId) {
+    public Boolean pendingAlarmExists(Long orderId) {
         return alarmDAO.findByStatusAndOrder_Id(Alarm.Status.PENDING, orderId).isPresent();
     }
 
