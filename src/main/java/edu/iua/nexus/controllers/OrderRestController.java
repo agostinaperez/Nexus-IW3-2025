@@ -160,7 +160,7 @@ public class OrderRestController extends BaseRestController {
                                                            defaultValue = MediaType.APPLICATION_PDF_VALUE)
                                                    String acceptHeader) {
         // Respuesta en JSON
-        if (acceptHeader.equals(MediaType.APPLICATION_JSON_VALUE)) {
+        if (acceptHeader.contains(MediaType.APPLICATION_JSON_VALUE)) {
             Map<String, Object> conciliationData = orderBusiness.getConciliationJson(idOrder);
             return new ResponseEntity<>(conciliationData, HttpStatus.OK);
         }
