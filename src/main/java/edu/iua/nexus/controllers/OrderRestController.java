@@ -153,7 +153,7 @@ public class OrderRestController extends BaseRestController {
     }
 
     @GetMapping("/conciliation/{idOrder}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('OPERATOR') or hasRole('CLI1') or hasRole('CLI2') or hasRole('CLI3')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_OPERATOR') or hasRole('ROLE_CLI1') or hasRole('ROLE_CLI2') or hasRole('ROLE_CLI3')")
     @SneakyThrows
     public ResponseEntity<?> getConciliationReport(@PathVariable("idOrder") Long idOrder,
                                                    @RequestHeader(value = HttpHeaders.ACCEPT,
