@@ -27,7 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Punto de handshake usado por los clientes STOMP para levantar la conexion WebSocket
-        registry.addEndpoint("/notifier").setAllowedOrigins("http://localhost:5173");
+        registry.addEndpoint("/notifier").setAllowedOrigins("http://localhost:5173", "https://agostinaiw3.chickenkiller.com");
     }
 
 }
