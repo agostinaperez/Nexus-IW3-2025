@@ -153,18 +153,12 @@ public class OrderRestController extends BaseRestController {
     }
 
     @GetMapping("/conciliation/{idOrder}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_OPERATOR')  or hasRole('ROLE_CLI1') or hasRole('ROLE_CLI2') or hasRole('ROLE_CLI3')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('OPERATOR') or hasRole('CLI1') or hasRole('CLI2') or hasRole('CLI3')")
     @SneakyThrows
     public ResponseEntity<?> getConciliationReport(@PathVariable("idOrder") Long idOrder,
                                                    @RequestHeader(value = HttpHeaders.ACCEPT,
                                                            defaultValue = MediaType.APPLICATION_PDF_VALUE)
                                                    String acceptHeader) {
-        // Respuesta en JSON
-        if (acceptHeader.contains(MediaType.APPLICATION_JSON_VALUE)) {
-            Map<String, Object> conciliationData = orderBusiness.getConciliationJson(idOrder);
-            return new ResponseEntity<>(conciliationData, HttpStatus.OK);
-        }
-        // Respuesta en PDF
         byte[] pdfContent = orderBusiness.getConciliationPdf(idOrder);
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
