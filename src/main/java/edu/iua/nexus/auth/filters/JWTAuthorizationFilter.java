@@ -50,6 +50,13 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 		String param = req.getParameter(AuthConstants.AUTH_PARAM_NAME);
 		boolean byHeader = !(header == null || !header.startsWith(AuthConstants.TOKEN_PREFIX));
 		boolean byParam = !(param == null || param.trim().length() < 10);
+
+		String path = req.getServletPath();
+		if (path.equals("/api/v1/auth/login")) {
+			chain.doFilter(req, res);
+			return;
+		}
+
 		
 		// Si no se envía o es correcto el inicio de la cabecera o bien no se envía un
 		// parámetro correcto, se continúa con el resto de los filtros
