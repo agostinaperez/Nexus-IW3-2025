@@ -87,7 +87,6 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, Constants.URL_EXTERNAL_LOGIN).permitAll()
                         .requestMatchers(HttpMethod.POST, Constants.URL_INTERNAL_LOGIN).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/notifier/**").permitAll()
                         .requestMatchers("/notifier/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
