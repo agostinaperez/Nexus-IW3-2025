@@ -22,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -59,9 +60,8 @@ public class SecurityConfiguration {
 
         // FRONTEND URL (Vite)
         config.setAllowedOrigins(List.of(
-        "http://localhost:5173",
-        "https://agostinaiw3.chickenkiller.com"
-        ));
+                "http://localhost:5173",
+                "https://agostinaiw3.chickenkiller.com"));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
@@ -78,14 +78,15 @@ public class SecurityConfiguration {
         return (web) -> web.ignoring().requestMatchers("/notifier/**");
     }
 
-
     // SECURITY FILTER CHAIN
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+                .securityMatcher("/api/**") 
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults()) // <-- ACTIVAR CORS AQUÍ
+
+                .cors(Customizer.withDefaults())
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, Constants.URL_EXTERNAL_LOGIN).permitAll()
@@ -95,23 +96,19 @@ public class SecurityConfiguration {
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
-                        //.requestMatchers(HttpMethod.GET, "/api/v1/orders/conciliation/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/integration/**").authenticated()
-
-                        .anyRequest().authenticated()
-                )
-
+                        .anyRequest().authenticated())
 
                 .exceptionHandling(e -> e.accessDeniedHandler(accessDeniedHandler))
 
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // Tu filtro JWT
-        http.addFilter(new JWTAuthorizationFilter(authenticationManager()));
+        // Agregar el filtro JWT explícitamente ANTES de
+        // UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(new JWTAuthorizationFilter(authenticationManager()),
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
