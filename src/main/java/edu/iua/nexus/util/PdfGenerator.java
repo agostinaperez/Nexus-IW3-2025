@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.core.io.ClassPathResource;
+
 public class PdfGenerator {
 
     public static byte[] generateSimpleTextPdf(String content) throws DocumentException, IOException {
@@ -51,7 +53,9 @@ public class PdfGenerator {
                 FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.GRAY)));
         document.add(new Paragraph(" "));
 
-        Image logo = Image.getInstance("logo.png");
+        ClassPathResource logoResource = new ClassPathResource("static/images/logo.png");
+        Image logo = Image.getInstance(logoResource.getURL());
+
         logo.scaleToFit(500, 150);
         logo.setAlignment(Element.ALIGN_CENTER);
         document.add(logo);
