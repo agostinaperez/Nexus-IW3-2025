@@ -4,10 +4,13 @@ import edu.iua.nexus.Constants;
 import edu.iua.nexus.auth.custom.CustomAuthenticationManager;
 import edu.iua.nexus.auth.filters.JWTAuthorizationFilter;
 import edu.iua.nexus.auth.model.IUserAuthBusiness;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -16,6 +19,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -29,6 +34,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@Slf4j
 public class SecurityConfiguration {
 
     @Autowired
@@ -112,4 +118,29 @@ public class SecurityConfiguration {
 
         return http.build();
     }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            // 1) Obtengo el usuario que se logueó
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            // 2) Obtengo la URL a la que intentó entrar
+            String uri = request.getRequestURI();
+            String method = request.getMethod();
+
+            if (auth != null) {
+                String username = auth.getName();
+                String authorities = auth.getAuthorities().toString();
+
+                log.warn("Acceso denegado al endpoint = {} {} | Usuario = {} | Roles = {}",
+                        method, uri, username, authorities);
+            } else {
+                log.warn("Acceso denegado al endpoint = {} {} | Usuario ANÓNIMO / no autenticado",
+                        method, uri);
+            }
+
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+        };
+    }
+
 }
