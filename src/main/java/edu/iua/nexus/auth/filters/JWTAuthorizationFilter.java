@@ -51,6 +51,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 		boolean byHeader = !(header == null || !header.startsWith(AuthConstants.TOKEN_PREFIX));
 		boolean byParam = !(param == null || param.trim().length() < 10);
 		String path = req.getServletPath();
+		log.info("JWTFilter: URI={}; Method={}; AuthHeader={}",
+             req.getRequestURI(), req.getMethod(),
+             req.getHeader(AuthConstants.AUTH_HEADER_NAME));
 		if (path.startsWith("/notifier")) {
 			chain.doFilter(req, res);
 			return;
