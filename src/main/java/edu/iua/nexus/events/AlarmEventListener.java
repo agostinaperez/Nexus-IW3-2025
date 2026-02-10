@@ -92,6 +92,14 @@ public class AlarmEventListener implements ApplicationListener<AlarmEvent> {
             log.error("Failed to send alert notification", e);
         }
 
+        try {
+            final String remindersTopic = "/topic/alarms/reminders";
+            log.info("Sending alarm to reminders topic for order {}", alarm.getOrder().getId());
+            wSock.convertAndSend(remindersTopic, alarmWsWrapper);
+        } catch (Exception e) {
+            log.error("Failed to send alarm to reminders topic", e);
+        }
+
         // Armado de mail de alerta
         String subject = "Temperatura Excedida Orden Nro " + detail.getOrder().getId();
         String mensaje = String.format(
